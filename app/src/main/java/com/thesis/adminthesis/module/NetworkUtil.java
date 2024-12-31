@@ -109,7 +109,7 @@ public class NetworkUtil {
                     JSONObject itemJson = jsonArray.getJSONObject(i);
 
                     // Example of extracting data, assuming each item has a "name" and "description"
-                    String deviceConnection = itemJson.getString("deviceConnection");
+                    String deviceConnection = itemJson.getString("sourcePlace");
 
                     // Create an Item object and add it to the list
                     itemList.add(new Item(deviceConnection));

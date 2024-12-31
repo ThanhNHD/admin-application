@@ -25,7 +25,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainActivity extends AppCompatActivity {
     private EditText serverIpEditText, itemEditText, serverPassword;
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             Button connectButton = findViewById(R.id.connect);
             connectButton.setOnClickListener(view -> {
                 try {
-                    runOnStopEditingServerIp();
+                    connectToMessageServerJob();
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -132,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void runOnStopEditingServerIp() throws JSONException {
+    private void connectToMessageServerJob() throws JSONException {
         String serverIpAddress = serverIpEditText.getText().toString();
         if (serverPassword.getText() != null && serverPassword.getText().length() != 0 && checkServerIpEmpty(serverIpAddress) && NetworkUtil.isValidIpAndPortUrl(serverIpAddress)) {
             JSONObject json = new JSONObject();
@@ -143,10 +142,10 @@ public class MainActivity extends AppCompatActivity {
                 if (statusCode == 200) {
                     enableFunctionButton();
                     for (Item item : items) {
-                        if (NetworkUtil.isValidIp(item.getDeviceConnection())) {
-                            addItemsToList(NetworkUtil.getIpAndPort(item.getDeviceConnection()));
+                        if (NetworkUtil.isValidIp(item.getSourcePlace())) {
+                            addItemsToList(NetworkUtil.getIpAndPort(item.getSourcePlace()));
                         } else {
-                            addItemsToList(item.getDeviceConnection());
+                            addItemsToList(item.getSourcePlace());
                         }
                     }
                     try {
@@ -185,15 +184,14 @@ public class MainActivity extends AppCompatActivity {
         new AlertDialog.Builder(this).setTitle("Permission Denied").setMessage("Network permissions are required to use this app. Please grant them in settings.").setCancelable(false).setPositiveButton("Exit", (dialog, which) -> finish()).show();
     }
 
-    public void removeDevice(String deviceIp) {
-        if (deviceIp != null) {
+    public void removeDevice(String sourcePlace) {
+        if (sourcePlace != null) {
             JSONObject json = new JSONObject();
             try {
-                if (NetworkUtil.isValidIp(deviceIp)) {
-                    json.put("deviceIp", "rtsp://" + deviceIp);
-                }
-                else{
-                    json.put("deviceIp",deviceIp);
+                if (NetworkUtil.isValidIp(sourcePlace)) {
+                    json.put("sourcePlace", "rtsp://" + sourcePlace);
+                } else {
+                    json.put("sourcePlace", sourcePlace);
                 }
                 json.put("password", serverPassword.getText());
             } catch (Exception e) {
@@ -259,7 +257,11 @@ public class MainActivity extends AppCompatActivity {
             JSONObject faJson = new JSONObject();
             try {
                 faJson.put("password", serverPassword.getText());
-                json.put("deviceConnection", "rtsp://" + item + ":1935");
+                if (NetworkUtil.isValidIp(item)) {
+                    json.put("sourcePlace", "rtsp://" + item + ":1935");
+                } else {
+                    json.put("sourcePlace", item);
+                }
                 faJson.put("data", json);
             } catch (Exception e) {
                 Log.e(TAG, Objects.requireNonNull(e.getMessage()));
@@ -271,7 +273,11 @@ public class MainActivity extends AppCompatActivity {
                             if (statusCode != 200) {
                                 Toast.makeText(MainActivity.this, "add device failed", Toast.LENGTH_SHORT).show();
                             } else {
-                                addItemsToList(item + ":1935");
+                                if (NetworkUtil.isValidIp(item)) {
+                                    addItemsToList(item + ":1935");
+                                } else {
+                                    addItemsToList(item);
+                                }
                             }
                         });
             }

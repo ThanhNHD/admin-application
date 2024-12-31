@@ -2,12 +2,12 @@ package com.thesis.adminthesis.model;
 
 public class Item {
     private Long id;
-    private String deviceConnection;
+    private String sourcePlace;
     private String username;
     private String password;
 
-    public Item(String deviceConnection) {
-        this.deviceConnection = deviceConnection;
+    public Item(String sourcePlace) {
+        this.sourcePlace = sourcePlace;
     }
 
     public Long getId() {
@@ -18,12 +18,12 @@ public class Item {
         this.id = id;
     }
 
-    public String getDeviceConnection() {
-        return deviceConnection;
+    public String getSourcePlace() {
+        return sourcePlace;
     }
 
-    public void setDeviceConnection(String deviceConnection) {
-        this.deviceConnection = deviceConnection;
+    public void setSourcePlace(String sourcePlace) {
+        this.sourcePlace = sourcePlace;
     }
 
     public String getUsername() {
